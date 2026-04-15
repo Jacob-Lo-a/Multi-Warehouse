@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Hangfire;
+using Microsoft.Extensions.Options;
 using Multi_Warehouse.Core;
 using Multi_Warehouse.Core.interfaces;
 using Renci.SshNet;
@@ -12,7 +13,8 @@ namespace Multi_Warehouse.API.Services
         {
             _settings = settings.Value;
         }
-
+       
+        [AutomaticRetry(Attempts = 3, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         public async Task UploadReportAsync(byte[] fileData, string remoteFileName)
         {
             using var client = new SftpClient(

@@ -1,4 +1,5 @@
-﻿using Multi_Warehouse.Core.DTOs;
+﻿using Multi_Warehouse.API.Exceptions;
+using Multi_Warehouse.Core.DTOs;
 using Multi_Warehouse.Core.interfaces;
 using Multi_Warehouse.Core.Models;
 namespace Multi_Warehouse.API.Services
@@ -36,11 +37,11 @@ namespace Multi_Warehouse.API.Services
             if (!await _productRepo.ExistsAsync(request.ProductId) ||
                 !await _warehouseRepo.ExistsAsync(request.WarehouseId))
             {
-                throw new Exception("產品或倉庫不存在");
+                throw new ProductOrWarehouseNotExist();
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
-
+            
             try
             {
                 var stock = await _stockRepo.GetAsync(request.ProductId, request.WarehouseId);

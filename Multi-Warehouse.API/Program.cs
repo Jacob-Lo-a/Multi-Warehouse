@@ -5,6 +5,7 @@ using Multi_Warehouse.API.Services;
 using Multi_Warehouse.Core;
 using Multi_Warehouse.Core.interfaces;
 using Multi_Warehouse.Core.Models;
+using NLog.Web;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -26,6 +27,9 @@ builder.Services.AddScoped<ISftpService, SftpService>();
 
 builder.Services.Configure<Sftpsettings>(
     builder.Configuration.GetSection("SftpSettings"));
+
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 
 builder.Services.AddDbContext<AdvancedWmsDbContext>(options =>
     options.UseSqlServer(
