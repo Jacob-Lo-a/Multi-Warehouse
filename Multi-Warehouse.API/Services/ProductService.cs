@@ -11,18 +11,21 @@ namespace Multi_Warehouse.API.Services
         private readonly IStockRepository _stockRepo;
         private readonly IStockLogRepository _logRepo;
         private readonly AdvancedWmsDbContext _context;
+        private readonly ILogger<ProductService> _logger;
         public ProductService(
         IProductsRepository productRepo,
         IWarehouseRepository warehouseRepo,
         IStockRepository stockRepo,
         IStockLogRepository logRepo,
-        AdvancedWmsDbContext context)
+        AdvancedWmsDbContext context,
+        ILogger<ProductService> logger)
         {
             _productRepo = productRepo;
             _warehouseRepo = warehouseRepo;
             _stockRepo = stockRepo;
             _logRepo = logRepo;
             _context = context;
+            _logger = logger;
         }
 
         public async Task<List<ProductWithStockDto>> GetProductsWithStocksAsync()
@@ -72,13 +75,14 @@ namespace Multi_Warehouse.API.Services
                         ? "入庫"
                         : request.Remark
                 });
-
+                
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
-            catch
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                _logger.LogError(ex, "交易失敗，資料已 Rollback");
                 throw;
             }
         }
